@@ -1,0 +1,5 @@
+{
+    "watch": ["db", "models", "modules", "shared", "public"],
+    "ext": "ts,json,js",
+    "exec": "npm run build && npm run start"
+}
