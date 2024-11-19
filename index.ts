@@ -1,11 +1,11 @@
 import http from 'http';
-import createServer from './api';
+import createApp from './api';
 import Env from './shared/env';
 import Logger from './shared/helpers/logger';
 
 (function () {
     try {
-        const app = createServer();
+        const app = createApp();
         const server = http.createServer(app);
         const port = Env.PORT;
         if (isNaN(port)) throw new Error('PORT specified is not a number!');

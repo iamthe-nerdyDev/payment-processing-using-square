@@ -14,7 +14,7 @@ import ApplicationError from '../shared/helpers/applicationError';
 import sanitizeInput from '../middlewares/sanitizeInputs';
 import { version } from '../package.json';
 
-export default function createServer() {
+export default function createApp() {
     const app = express();
 
     app.use(express.json());
