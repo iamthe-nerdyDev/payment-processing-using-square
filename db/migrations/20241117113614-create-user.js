@@ -9,22 +9,15 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER,
             },
-            user_uuid: {
-                allowNull: false,
-                type: Sequelize.UUID,
-                defaultValue: Sequelize.UUIDV4,
-                primaryKey: true,
-                unique: true,
-            },
-            first_name: {
+            firstName: {
                 allowNull: false,
                 type: Sequelize.STRING,
             },
-            last_name: {
+            lastName: {
                 allowNull: false,
                 type: Sequelize.STRING,
             },
-            email_address: {
+            emailAddress: {
                 allowNull: false,
                 type: Sequelize.STRING,
                 unique: true,
@@ -33,20 +26,22 @@ module.exports = {
                 allowNull: false,
                 type: Sequelize.STRING,
             },
-            square_customer_id: {
+            squareCustomerId: {
                 allowNull: false,
-                primaryKey: true,
                 type: Sequelize.STRING,
             },
             metadata: {
                 type: Sequelize.JSONB,
             },
-            created_at: {
+            createdAt: {
                 allowNull: false,
                 type: Sequelize.DATE,
             },
-            updated_at: {
+            updatedAt: {
                 allowNull: false,
+                type: Sequelize.DATE,
+            },
+            deletedAt: {
                 type: Sequelize.DATE,
             },
         });

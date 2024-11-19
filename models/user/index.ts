@@ -1,39 +1,47 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import bcryptjs from 'bcryptjs';
-import sequelize from '../../../shared/adapters/sequelize';
+import sequelize from '../../shared/adapters/sequelize';
 import Card from '../card';
+import Session from '../session';
+import Payment from '../payment';
 
 interface UserAttributes {
     id: number;
-    user_uuid: string;
-    first_name: string;
-    last_name: string;
-    email_address: string;
+    firstName: string;
+    lastName: string;
+    emailAddress: string;
     password: string;
-    partner_customer_id: string;
+    squareCustomerId: string;
     metadata?: any;
-    created_at?: Date;
-    updated_at?: Date;
-    deleted_at?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
+    cards?: Card[];
+    sessions?: Session[];
+    payments?: Payment[];
 }
 
-export interface UserInput extends Optional<UserAttributes, 'id' | 'user_uuid'> {}
+export interface UserInput extends Optional<UserAttributes, 'id' | 'squareCustomerId'> {}
 export interface UserOuput extends Required<UserAttributes> {}
 
 class User extends Model<UserAttributes, UserInput> implements UserAttributes {
     public id!: number;
-    public user_uuid!: string;
-    public first_name!: string;
-    public last_name!: string;
-    public email_address!: string;
+    public firstName!: string;
+    public lastName!: string;
+    public emailAddress!: string;
     public password!: string;
-    public partner_customer_id!: string;
+    public squareCustomerId!: string;
     public metadata!: any;
 
     // timestamps
-    public readonly created_at!: Date;
-    public readonly updated_at!: Date;
-    public readonly deleted_at!: Date;
+    public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
+    public readonly deletedAt!: Date;
+
+    // external model/s
+    public readonly cards!: Card[];
+    public readonly sessions!: Session[];
+    public readonly payments!: Payment[];
 }
 
 User.init(
@@ -43,14 +51,7 @@ User.init(
             autoIncrement: true,
             primaryKey: true,
         },
-        user_uuid: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            allowNull: false,
-            primaryKey: true,
-            unique: true,
-        },
-        first_name: {
+        firstName: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
@@ -62,7 +63,7 @@ User.init(
                 },
             },
         },
-        last_name: {
+        lastName: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
@@ -74,15 +75,15 @@ User.init(
                 },
             },
         },
-        email_address: {
+        emailAddress: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notNull: {
-                    msg: 'First name cannot be null',
+                    msg: 'Email address cannot be null',
                 },
                 notEmpty: {
-                    msg: 'First name cannot be empty',
+                    msg: 'Email address cannot be empty',
                 },
                 isEmail: {
                     msg: 'Invalid email',
@@ -105,7 +106,7 @@ User.init(
                 },
             },
         },
-        partner_customer_id: {
+        squareCustomerId: {
             type: DataTypes.STRING,
             allowNull: false,
         },
@@ -115,14 +116,20 @@ User.init(
         },
     },
     {
+        modelName: 'users',
         timestamps: true,
         sequelize,
         paranoid: true,
-        deletedAt: 'deleted_at',
     }
 );
 
-User.hasMany(Card, { foreignKey: 'user_uuid' });
-Card.belongsTo(User, { foreignKey: 'user_uuid' });
+User.hasMany(Card, { foreignKey: 'userId' });
+Card.belongsTo(User, { foreignKey: 'userId' });
+
+User.hasMany(Session, { foreignKey: 'userId' });
+Session.belongsTo(User, { foreignKey: 'userId' });
+
+User.hasMany(Payment, { foreignKey: 'userId' });
+Payment.belongsTo(User, { foreignKey: 'userId' });
 
 export default User;

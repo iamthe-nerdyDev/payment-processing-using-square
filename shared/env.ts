@@ -20,6 +20,7 @@ NODE_ENV = NODE_ENV || 'development';
 const IS_PROD = NODE_ENV === 'production';
 const IS_DEV = NODE_ENV === 'development';
 
+PORT = PORT || '7777';
 JWT_SECRET = JWT_SECRET || 'something_super_secret';
 ACCESS_TOKEN_TTL = ACCESS_TOKEN_TTL || '5m';
 REFRESH_TOKEN_TTL = REFRESH_TOKEN_TTL || '1y';

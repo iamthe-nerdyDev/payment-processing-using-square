@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('cards', {
+        await queryInterface.createTable('payments', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
@@ -17,47 +17,36 @@ module.exports = {
                     key: 'id',
                 },
             },
-            squareCardId: {
+            cardId: {
+                allowNull: false,
+                type: Sequelize.INTEGER,
+                references: {
+                    model: 'cards',
+                    key: 'id',
+                },
+            },
+            reference: {
                 allowNull: false,
                 type: Sequelize.STRING,
                 unique: true,
             },
-            verificationToken: {
+            amount: {
                 allowNull: false,
+                type: Sequelize.DECIMAL,
+            },
+            currency: {
+                allowNull: false,
+                type: Sequelize.ENUM('EUR', 'USD'),
+            },
+            status: {
+                allowNull: false,
+                defaultValue: 'initiated',
+                type: Sequelize.ENUM('initiated', 'failed', 'successful', 'cancelled'),
+            },
+            squarePaymentId: {
                 type: Sequelize.STRING,
-                unique: true,
-            },
-            enabled: {
-                allowNull: false,
-                type: Sequelize.BOOLEAN,
-                defaultValue: true,
-            },
-            last4: {
-                allowNull: false,
-                type: Sequelize.STRING,
-            },
-            cardholderName: {
-                allowNull: false,
-                type: Sequelize.STRING,
-            },
-            cardBrand: {
-                allowNull: false,
-                type: Sequelize.STRING,
-            },
-            cardType: {
-                allowNull: false,
-                type: Sequelize.STRING,
-            },
-            expMonth: {
-                allowNull: false,
-                type: Sequelize.INTEGER,
-            },
-            expYear: {
-                allowNull: false,
-                type: Sequelize.INTEGER,
             },
             metadata: {
-                allowNull: true,
                 type: Sequelize.JSONB,
             },
             createdAt: {
@@ -74,6 +63,6 @@ module.exports = {
         });
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('cards');
+        await queryInterface.dropTable('payments');
     },
 };

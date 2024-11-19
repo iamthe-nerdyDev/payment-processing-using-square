@@ -1,23 +1,24 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../../../shared/adapters/sequelize';
+import sequelize from '../../shared/adapters/sequelize';
+import Payment from '../payment';
 
 interface CardAttributes {
     id: number;
-    square_card_id: string;
-    user_uuid: string;
+    userId: number;
+    squareCardId: string;
+    verificationToken: string;
     enabled: boolean;
-    last_4: string;
-    cardholder_name: string;
-    card_brand: string;
-    card_type: string;
-    exp_month: number;
-    exp_year: number;
+    last4: string;
+    cardholderName: string;
+    cardBrand: string;
+    cardType: string;
+    expMonth: number;
+    expYear: number;
     metadata?: any;
-
-    // timestamps
-    created_at?: Date;
-    updated_at?: Date;
-    deleted_at?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
+    payments?: Payment[];
 }
 
 export interface CardInput extends Optional<CardAttributes, 'id'> {}
@@ -25,20 +26,25 @@ export interface CardOuput extends Required<CardAttributes> {}
 
 class Card extends Model<CardAttributes, CardInput> implements CardAttributes {
     public id!: number;
-    public square_card_id!: string;
-    public user_uuid!: string;
+    public squareCardId!: string;
+    public verificationToken!: string;
+    public userId!: number;
     public enabled!: boolean;
-    public last_4!: string;
-    public cardholder_name!: string;
-    public card_brand!: string;
-    public card_type!: string;
-    public exp_month!: number;
-    public exp_year!: number;
+    public last4!: string;
+    public cardholderName!: string;
+    public cardBrand!: string;
+    public cardType!: string;
+    public expMonth!: number;
+    public expYear!: number;
     public metadata!: any;
 
-    public readonly created_at!: Date;
-    public readonly updated_at!: Date;
-    public readonly deleted_at!: Date;
+    // timestamps
+    public readonly createdAt!: Date;
+    public readonly updatedAt!: Date;
+    public readonly deletedAt!: Date;
+
+    // external model/s
+    public readonly payments!: Payment[];
 }
 
 Card.init(
@@ -48,10 +54,41 @@ Card.init(
             autoIncrement: true,
             primaryKey: true,
         },
-        square_card_id: {
+        userId: {
+            type: DataTypes.INTEGER.UNSIGNED,
+            allowNull: false,
+            validate: {
+                notNull: {
+                    msg: 'User ID cannot be null',
+                },
+                notEmpty: {
+                    msg: 'User ID cannot be empty',
+                },
+                isInt: {
+                    msg: 'User ID should be an integer',
+                },
+            },
+            references: {
+                model: 'users',
+                key: 'id',
+            },
+        },
+        verificationToken: {
             type: DataTypes.STRING,
             allowNull: false,
-            primaryKey: true,
+            unique: true,
+            validate: {
+                notNull: {
+                    msg: 'Verification token cannot be null',
+                },
+                notEmpty: {
+                    msg: 'Verification token cannot be empty',
+                },
+            },
+        },
+        squareCardId: {
+            type: DataTypes.STRING,
+            allowNull: false,
             unique: true,
             validate: {
                 notNull: {
@@ -60,26 +97,6 @@ Card.init(
                 notEmpty: {
                     msg: 'Square Card ID cannot be empty',
                 },
-            },
-        },
-        user_uuid: {
-            type: DataTypes.UUID,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'User UUID cannot be null',
-                },
-                notEmpty: {
-                    msg: 'User UUID cannot be empty',
-                },
-                isUUID: {
-                    args: 4,
-                    msg: 'User UUID is not a valid UUIDv4',
-                },
-            },
-            references: {
-                model: 'User',
-                key: 'user_uuid',
             },
         },
         enabled: {
@@ -93,7 +110,7 @@ Card.init(
                 },
             },
         },
-        last_4: {
+        last4: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
@@ -105,7 +122,7 @@ Card.init(
                 },
             },
         },
-        cardholder_name: {
+        cardholderName: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
@@ -117,7 +134,7 @@ Card.init(
                 },
             },
         },
-        card_brand: {
+        cardBrand: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
@@ -129,7 +146,7 @@ Card.init(
                 },
             },
         },
-        card_type: {
+        cardType: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
@@ -141,11 +158,11 @@ Card.init(
                 },
             },
         },
-        exp_month: {
+        expMonth: {
             type: DataTypes.INTEGER.UNSIGNED,
             allowNull: false,
         },
-        exp_year: {
+        expYear: {
             type: DataTypes.INTEGER.UNSIGNED,
             allowNull: false,
         },
@@ -155,11 +172,14 @@ Card.init(
         },
     },
     {
+        modelName: 'cards',
         timestamps: true,
         sequelize,
         paranoid: true,
-        deletedAt: 'deleted_at',
     }
 );
+
+Card.hasMany(Payment, { foreignKey: 'cardId' });
+Payment.belongsTo(Card, { foreignKey: 'cardId' });
 
 export default Card;

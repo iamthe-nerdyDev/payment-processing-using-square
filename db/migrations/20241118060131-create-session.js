@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('cards', {
+        await queryInterface.createTable('sessions', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
@@ -17,44 +17,16 @@ module.exports = {
                     key: 'id',
                 },
             },
-            squareCardId: {
-                allowNull: false,
+            device: {
                 type: Sequelize.STRING,
-                unique: true,
             },
-            verificationToken: {
-                allowNull: false,
+            ip: {
                 type: Sequelize.STRING,
-                unique: true,
             },
-            enabled: {
+            isActive: {
                 allowNull: false,
-                type: Sequelize.BOOLEAN,
                 defaultValue: true,
-            },
-            last4: {
-                allowNull: false,
-                type: Sequelize.STRING,
-            },
-            cardholderName: {
-                allowNull: false,
-                type: Sequelize.STRING,
-            },
-            cardBrand: {
-                allowNull: false,
-                type: Sequelize.STRING,
-            },
-            cardType: {
-                allowNull: false,
-                type: Sequelize.STRING,
-            },
-            expMonth: {
-                allowNull: false,
-                type: Sequelize.INTEGER,
-            },
-            expYear: {
-                allowNull: false,
-                type: Sequelize.INTEGER,
+                type: Sequelize.BOOLEAN,
             },
             metadata: {
                 allowNull: true,
@@ -74,6 +46,6 @@ module.exports = {
         });
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('cards');
+        await queryInterface.dropTable('sessions');
     },
 };
