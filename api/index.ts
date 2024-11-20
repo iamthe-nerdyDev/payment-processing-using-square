@@ -59,14 +59,6 @@ export default function createApp() {
                 title: 'Payment processing using Square',
                 version,
             },
-            servers: [
-                {
-                    url: 'http://localhost:7777',
-                },
-                {
-                    url: 'https://payment-gateway-fi7h.onrender.com',
-                },
-            ],
             components: {
                 securitySchemes: {
                     bearerAuth: {
@@ -82,6 +74,7 @@ export default function createApp() {
                 },
             ],
         },
+        schemes: ['http', 'https'],
         apis: [
             './api/*.ts',
             './api/v1/*.ts',
