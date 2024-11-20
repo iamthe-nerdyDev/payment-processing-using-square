@@ -18,8 +18,9 @@ services:
             generateValue: true
           - key: SQUARE_ACCESS_TOKEN
             value: --
-    - type: static
+    - type: web
       name: payment gateway frontend with square
+      runtime: static
       buildCommand: true
       staticPublishPath: ./public
       headers:
