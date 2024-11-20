@@ -1,23 +1,18 @@
 import { Request, Response } from 'express';
 import bcryptjs from 'bcryptjs';
-import { CardRepo, PaymentRepo, SessionRepo, UserRepo } from '../../repos';
 import ApplicationError from '../../shared/helpers/applicationError';
 import { Card, Payment } from '../../models';
 import { get } from 'lodash';
 import common from '../../shared/common';
+import baseRepo from '../../repos';
 
 export default class UserController {
-    constructor(
-        private userRepo = new UserRepo(),
-        private sessionRepo = new SessionRepo(),
-        private paymentRepo = new PaymentRepo(),
-        private cardRepo = new CardRepo()
-    ) {}
+    constructor(private repo = baseRepo) {}
 
     async whoami(_: Request, res: Response) {
         const { user: local_user } = res.locals;
 
-        const user = await this.userRepo.Model.findByPk(local_user?.id, {
+        const user = await this.repo.user.Model.findByPk(local_user?.id, {
             include: {
                 model: Card,
                 attributes: {
@@ -60,17 +55,17 @@ export default class UserController {
         const payload = req.body;
         payload.emailAddress = payload.emailAddress.toLowerCase();
 
-        const user = await this.userRepo.Model.findOne({
+        const user = await this.repo.user.Model.findOne({
             where: {
                 emailAddress: payload.emailAddress,
             },
         });
 
         if (!user || !bcryptjs.compareSync(payload.password, user.password)) {
-            throw new ApplicationError('Incorrect email address or password', 400);
+            throw new ApplicationError('Incorrect email address or password', 409);
         }
 
-        const session = await this.sessionRepo.newSession({
+        const session = await this.repo.session.newSession({
             userId: user.id,
             isActive: true,
             ip: common.getIpAddress(req) || null,
@@ -81,8 +76,8 @@ export default class UserController {
             data: { user_id: user.id, session_id: session.id },
         };
 
-        const access_token = this.sessionRepo.signJWT(jwtPayload, 'access');
-        const refresh_token = this.sessionRepo.signJWT(jwtPayload, 'refresh');
+        const access_token = this.repo.session.signJWT(jwtPayload, 'access');
+        const refresh_token = this.repo.session.signJWT(jwtPayload, 'refresh');
 
         return res.status(200).json({
             status: true,
@@ -97,14 +92,14 @@ export default class UserController {
 
         const { emailAddress, password, firstName, lastName } = payload;
 
-        const user = await this.userRepo.createUser({
+        const user = await this.repo.user.createUser({
             emailAddress,
             firstName,
             lastName,
             password,
         });
 
-        const session = await this.sessionRepo.newSession({
+        const session = await this.repo.session.newSession({
             userId: user.id,
             isActive: true,
             ip: common.getIpAddress(req) || null,
@@ -115,8 +110,8 @@ export default class UserController {
             data: { user_id: user.id, session_id: session.id },
         };
 
-        const access_token = this.sessionRepo.signJWT(jwtPayload, 'access');
-        const refresh_token = this.sessionRepo.signJWT(jwtPayload, 'refresh');
+        const access_token = this.repo.session.signJWT(jwtPayload, 'access');
+        const refresh_token = this.repo.session.signJWT(jwtPayload, 'refresh');
 
         return res.status(201).json({
             status: true,
@@ -136,7 +131,7 @@ export default class UserController {
 
         const offset = (page - 1) * limit;
 
-        const { rows: payments, count } = await this.paymentRepo.Model.findAndCountAll({
+        const { rows: payments, count } = await this.repo.payment.Model.findAndCountAll({
             where: {
                 userId: user?.id,
             },
@@ -172,7 +167,7 @@ export default class UserController {
 
         const offset = (page - 1) * limit;
 
-        const { rows: cards, count } = await this.cardRepo.Model.findAndCountAll({
+        const { rows: cards, count } = await this.repo.card.Model.findAndCountAll({
             where: {
                 userId: user?.id,
             },

@@ -38,12 +38,12 @@ class Session extends Model<SessionAttributes, SessionInput> implements SessionA
 Session.init(
     {
         id: {
-            type: DataTypes.INTEGER.UNSIGNED,
+            type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
         },
         userId: {
-            type: DataTypes.INTEGER.UNSIGNED,
+            type: DataTypes.INTEGER,
             allowNull: false,
             validate: {
                 notNull: {

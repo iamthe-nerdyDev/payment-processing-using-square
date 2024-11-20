@@ -113,7 +113,10 @@ export default function createApp() {
     app.use(
         '*',
         catchAsync((req) => {
-            throw new ApplicationError(`${req.originalUrl} not found on server`, 404);
+            throw new ApplicationError(
+                `[${req.method}] '${req.originalUrl}' not found on server`,
+                404
+            );
         })
     );
 

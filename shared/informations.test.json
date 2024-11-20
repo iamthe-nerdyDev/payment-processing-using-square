@@ -1,0 +1,15 @@
+{
+    "user": {
+        "id": 1,
+        "emailAddress": "momoreoluwaadedeji@gmai.com",
+        "firstName": "Morifeoluwa",
+        "lastName": "Adedeji",
+        "password": "1234567",
+        "cards": [
+            {
+                "id": 1,
+                "enabled": true
+            }
+        ]
+    }
+}

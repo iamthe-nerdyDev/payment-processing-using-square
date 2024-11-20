@@ -13,6 +13,7 @@ let {
 
 NODE_ENV = NODE_ENV || 'development';
 
+const IS_TEST = NODE_ENV === 'test';
 const IS_PROD = NODE_ENV === 'production';
 const IS_DEV = NODE_ENV === 'development';
 
@@ -26,6 +27,7 @@ if (!DATABASE_URL) throw 'DATABASE_URL missing in .env';
 export default {
     IS_DEV,
     IS_PROD,
+    IS_TEST,
     NODE_ENV,
     PORT: Number(PORT),
     DATABASE_URL,

@@ -34,8 +34,6 @@ export default class SessionRouter extends RoutesBase<SessionController> {
          *                                  $ref: '#/components/schemas/SessionSchema'
          *          403:
          *              description: Forbidden
-         *          404:
-         *              description: Not Found
          */
         this.router.get(
             `${this.path}`,
@@ -64,8 +62,6 @@ export default class SessionRouter extends RoutesBase<SessionController> {
          *                                  type: string
          *          403:
          *              description: Forbidden
-         *          404:
-         *              description: Not Found
          */
         this.router.delete(
             `${this.path}`,

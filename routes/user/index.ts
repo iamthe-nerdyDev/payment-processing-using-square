@@ -69,6 +69,12 @@ export default class UserRouter extends RoutesBase<UserController> {
          *                  application/json:
          *                      schema:
          *                          $ref: '#/components/schemas/ErrorSchema'
+         *          409:
+         *              description: Conflict
+         *              content:
+         *                  application/json:
+         *                      schema:
+         *                          $ref: '#/components/schemas/ErrorSchema'
          */
         this.router.post(
             `${this.path}/signin`,

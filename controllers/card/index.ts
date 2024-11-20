@@ -1,17 +1,17 @@
 import { Request, Response } from 'express';
-import { CardRepo } from '../../repos';
 import ApplicationError from '../../shared/helpers/applicationError';
 import { omit } from 'lodash';
 import { Payment } from '../../models';
+import baseRepo from '../../repos';
 
 export default class CardController {
-    constructor(private cardRepo = new CardRepo()) {}
+    constructor(private repo = baseRepo) {}
 
     async addCardHandler(req: Request, res: Response) {
         const { cardToken, verificationToken, cardholderName } = req.body;
         const { user } = res.locals;
 
-        const card = await this.cardRepo.createCard(
+        const card = await this.repo.card.createCard(
             cardToken,
             cardholderName,
             verificationToken,
@@ -39,7 +39,7 @@ export default class CardController {
             throw new ApplicationError('Card not found', 404);
         }
 
-        const card = await this.cardRepo.Model.findByPk(Number(cardId), {
+        const card = await this.repo.card.Model.findByPk(Number(cardId), {
             include: {
                 model: Payment,
                 attributes: {
@@ -68,7 +68,7 @@ export default class CardController {
             throw new ApplicationError('Card not found', 404);
         }
 
-        const card = await this.cardRepo.disableCard(Number(cardId));
+        const card = await this.repo.card.disableCard(Number(cardId));
         return res.status(200).json({
             status: true,
             message: 'Card disabled!',

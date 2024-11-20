@@ -1,13 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { get } from 'lodash';
-import { SessionRepo, UserRepo } from '../repos';
 import { Card } from '../models';
-
-const sessionRepo = new SessionRepo();
-const userRepo = new UserRepo();
+import baseRepo from '../repos';
 
 async function setResponseLocals(res: Response, data: { user_id: number; session_id: number }) {
-    const user = await userRepo.Model.findByPk(data.user_id, {
+    const user = await baseRepo.user.Model.findByPk(data.user_id, {
         include: {
             model: Card,
         },
@@ -24,7 +21,7 @@ export default async function (req: Request, res: Response, next: NextFunction) 
     const refreshToken = get(req.headers, 'x-refresh');
 
     if (!accessToken) return next();
-    const { decoded, expired } = sessionRepo.verifyJWT(accessToken);
+    const { decoded, expired } = baseRepo.session.verifyJWT(accessToken);
 
     if (decoded) {
         await setResponseLocals(res, decoded.data);
@@ -32,12 +29,12 @@ export default async function (req: Request, res: Response, next: NextFunction) 
     }
 
     if (expired && refreshToken) {
-        const newAccessToken = await sessionRepo.reIssueAccessToken(refreshToken as string);
+        const newAccessToken = await baseRepo.session.reIssueAccessToken(refreshToken as string);
 
         if (typeof newAccessToken == 'string') {
             res.setHeader('x-access-token', newAccessToken);
 
-            const result = sessionRepo.verifyJWT(newAccessToken as string);
+            const result = baseRepo.session.verifyJWT(newAccessToken as string);
             if (result.decoded) await setResponseLocals(res, result.decoded.data);
         }
 

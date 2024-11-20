@@ -25,6 +25,7 @@ export default class UserRepo {
         });
 
         const customer = createCustomerResponse.result.customer;
+        console.log(customer);
         if (!customer || !customer.id) {
             throw new ApplicationError('Could not get user information from thirdparty', 409);
         }

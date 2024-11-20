@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { PaymentRepo } from '../../repos';
 import { omit } from 'lodash';
 import { Card, User } from '../../models';
 import ApplicationError from '../../shared/helpers/applicationError';
+import baseRepo from '../../repos';
 
 export default class PaymentController {
-    constructor(private paymentRepo = new PaymentRepo()) {}
+    constructor(private repo = baseRepo) {}
 
     async initPaymentHandler(req: Request, res: Response) {
         const { user } = res.locals;
@@ -16,7 +16,7 @@ export default class PaymentController {
         if (!card) throw new ApplicationError('Card not found', 404);
         if (!card.enabled) throw new ApplicationError('Card not enabled', 400);
 
-        const payment = await this.paymentRepo.initPayment({
+        const payment = await this.repo.payment.initPayment({
             cardId,
             currency,
             amount,
@@ -34,7 +34,7 @@ export default class PaymentController {
         const { reference } = req.params;
         const { user } = res.locals;
 
-        const payment = await this.paymentRepo.Model.findOne({
+        const payment = await this.repo.payment.Model.findOne({
             where: { reference },
             include: [{ model: Card }, { model: User }],
         });
@@ -49,7 +49,7 @@ export default class PaymentController {
             );
         }
 
-        const response = await this.paymentRepo.debitCard(payment);
+        const response = await this.repo.payment.debitCard(payment);
         return res.status(200).json({
             status: true,
             message: 'Card debitted!',
@@ -59,6 +59,15 @@ export default class PaymentController {
                 'squarePaymentId',
                 'metadata',
                 'deletedAt',
+                'card.verificationToken',
+                'card.squareCardId',
+                'card.metadata',
+                'card.deletedAt',
+                'user.id',
+                'user.password',
+                'user.squareCustomerId',
+                'user.metadata',
+                'user.deletedAt',
             ]),
         });
     }
@@ -67,7 +76,7 @@ export default class PaymentController {
         const { paymentId } = req.params;
         const { user } = res.locals;
 
-        const payment = await this.paymentRepo.Model.findByPk(Number(paymentId), {
+        const payment = await this.repo.payment.Model.findByPk(Number(paymentId), {
             include: {
                 model: Card,
                 attributes: {
@@ -102,7 +111,7 @@ export default class PaymentController {
         const { paymentId } = req.params;
         const { user } = res.locals;
 
-        const payment = await this.paymentRepo.Model.findByPk(Number(paymentId));
+        const payment = await this.repo.payment.Model.findByPk(Number(paymentId));
         if (!payment) throw new ApplicationError('Payment not found', 404);
         if (payment.userId !== user?.id) return res.sendStatus(403);
 
