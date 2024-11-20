@@ -28,7 +28,6 @@ export default class PaymentRepo {
             const createPaymentResponse = await this.squareClient.paymentsApi.createPayment({
                 sourceId: payment.card.squareCardId,
                 idempotencyKey: crypto.randomUUID(),
-                // verificationToken: payment.card.verificationToken,
                 amountMoney: {
                     amount: BigInt(payment.amount * 100),
                     currency: payment.currency,
@@ -50,7 +49,7 @@ export default class PaymentRepo {
 
             await payment.update({
                 metadata: common.toMetadata(squarePayment),
-                status: 'completed',
+                status: 'successful',
             });
         } catch (e: any) {
             if (e instanceof ApiError) {

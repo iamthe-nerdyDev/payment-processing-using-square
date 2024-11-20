@@ -3,7 +3,8 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Payment Gateway using Square</title>
+        <title>Payment Gateway using Square - Card</title>
+        <link rel="stylesheet" href="./css/style.css" />
         <script
             type="text/javascript"
             src="https://sandbox.web.squarecdn.com/v1/square.js"
@@ -13,7 +14,7 @@
             const locationId = 'LGV49H19WXXJM';
             const baseURL = 'https://payment-gateway-vlng.onrender.com';
 
-            let accessToken, refreshToken;
+            let accessToken, refreshToken, whoami;
 
             function loadTokens() {
                 accessToken = localStorage.getItem('gateway/accessToken');
@@ -29,7 +30,7 @@
 
             async function addCardToUserProfile(token, verificationToken, cardholderName) {
                 const body = JSON.stringify({
-                    token,
+                    cardToken: token,
                     verificationToken,
                     cardholderName,
                 });
@@ -63,7 +64,7 @@
                 }
             }
 
-            async function verifyBuyer(payments, token) {
+            async function getWhoAmI() {
                 const whoamiResponse = await fetch(`${baseURL}/v1/user/whoami`, {
                     method: 'GET',
                     headers: {
@@ -72,19 +73,24 @@
                     },
                 });
 
-                if (!addCardResponse.ok) {
+                if (!whoamiResponse.ok) {
                     const errorBody = await whoamiResponse.text();
                     throw new Error(errorBody);
                 }
 
                 const { data: user } = await whoamiResponse.json();
+                return user;
+            }
+
+            async function verifyBuyer(payments, token) {
+                whoami = await getWhoAmI();
 
                 const verificationDetails = {
                     intent: 'STORE',
                     billingContact: {
-                        givenName: user.firstName,
-                        familyName: user.lastName,
-                        email: user.emailAddress,
+                        givenName: whoami.firstName,
+                        familyName: whoami.lastName,
+                        email: whoami.emailAddress,
                         addressLines: ['500 Electric Ave', 'Suite 600'],
                         state: 'NY',
                         countryCode: 'US',
@@ -98,6 +104,9 @@
             document.addEventListener('DOMContentLoaded', async function () {
                 if (!window.Square) throw new Error('Square.js failed to load properly');
 
+                const loader = document.getElementById('loader');
+                loader.style.display = 'flex';
+
                 let payments;
                 try {
                     payments = window.Square.payments(appId, locationId);
@@ -107,17 +116,29 @@
                     return;
                 }
 
+                loadTokens();
+
                 let card;
                 try {
                     card = await initializeCardModal(payments);
+                    whoami = await getWhoAmI();
+
+                    console.log('Whoami: ', whoami);
                 } catch (e) {
                     console.error('Initializing Card failed', e);
                     alert(`Square Error: ${e.message}` || 'Unable to initialize card');
                     return;
+                } finally {
+                    loader.style.display = 'none';
                 }
 
                 async function handlePaymentMethodSubmission(event, card) {
                     event.preventDefault();
+
+                    if (!accessToken || !refreshToken) {
+                        alert('access or refresh token not set');
+                        return;
+                    }
 
                     try {
                         cardButton.disabled = true;
@@ -129,7 +150,13 @@
                             'John Doe'
                         );
 
-                        console.debug('Payment Success', paymentResults);
+                        whoami = await getWhoAmI();
+
+                        cardsCounter.innerHTML = whoami?.cards?.length || 0;
+                        cardButton.disabled = false;
+                        alert(paymentResults.message || 'Card added to profile!');
+                        console.log('Payment Success', paymentResults);
+                        console.log('Whoami: ', whoami);
                     } catch (e) {
                         cardButton.disabled = false;
                         console.error(e.message);
@@ -141,14 +168,15 @@
                     await handlePaymentMethodSubmission(event, card);
                 });
 
+                const cardsCounter = document.getElementById('cards-count');
                 const updateTokensBtn = document.getElementById('update-tokens-btn');
                 const accessTokenInput = document.getElementById('accessTokenInput');
                 const refreshTokenInput = document.getElementById('refreshTokenInput');
 
-                loadTokens();
-
                 accessTokenInput.value = accessToken || '';
                 refreshTokenInput.value = refreshToken || '';
+
+                cardsCounter.innerHTML = whoami?.cards?.length || 0;
 
                 updateTokensBtn.addEventListener('click', function (event) {
                     event.preventDefault();
@@ -165,27 +193,44 @@
         </script>
     </head>
     <body>
-        <div class="container">
-            <h1>Add Card to your profile!</h1>
+        <div id="loader">Loading...</div>
 
-            <form action="#">
-                <div>
-                    <label for="accessTokenInput">Access Token:</label>
-                    <input type="text" id="accessTokenInput" />
-                </div>
+        <div class="container-block">
+            <div class="container">
+                <h1>Add Card to your profile!</h1>
 
-                <div>
-                    <label for="refreshTokenInput">Refresh Token:</label>
-                    <input type="text" id="refreshTokenInput" />
-                </div>
+                <form action="#" class="token-form">
+                    <p>
+                        Click
+                        <a
+                            target="_blank"
+                            href="https://payment-gateway-vlng.onrender.com/api-docs/#/User/post_v1_user_signin"
+                            >here</a
+                        >
+                        to get authorization tokens
+                    </p>
 
-                <button id="update-tokens-btn">Save tokens</button>
-            </form>
+                    <div>
+                        <label for="accessTokenInput">Access Token:</label>
+                        <input type="text" id="accessTokenInput" />
+                    </div>
 
-            <form id="payment-form">
-                <div id="card-container"></div>
-                <button id="card-button" type="button">Add Card to Profile</button>
-            </form>
+                    <div>
+                        <label for="refreshTokenInput">Refresh Token:</label>
+                        <input type="text" id="refreshTokenInput" />
+                    </div>
+
+                    <button id="update-tokens-btn">Save tokens</button>
+                </form>
+
+                <form id="payment-form">
+                    <div id="card-container"></div>
+                    <button id="card-button" type="button">Add Card to Profile</button>
+                </form>
+
+                <a href="./payment.html">Click here to make a payment</a>
+                <p class="info">You have <strong id="cards-count">1</strong> card/s</p>
+            </div>
         </div>
     </body>
 </html>
