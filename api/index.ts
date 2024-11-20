@@ -22,13 +22,21 @@ export default function createApp() {
 
     app.use(helmet());
 
+    const logsDIR = path.join(
+        __dirname,
+        '/../logs',
+        new Date().getFullYear().toString(),
+        (new Date().getMonth() + 1).toString().padStart(2, '0')
+    );
+
+    fs.mkdirSync(logsDIR, { recursive: true });
+
     app.use(
         morgan('combined', {
             stream: fs.createWriteStream(
                 path.join(
-                    __dirname,
-                    '/../logs',
-                    `access-${new Date().toISOString().split('T')[0]}.log`
+                    logsDIR,
+                    `access-${new Date().getDate().toString().padStart(2, '0')}.log`
                 ),
                 { flags: 'a' }
             ),
