@@ -1,6 +1,6 @@
 services:
     - type: web
-      name: payment-gateway-with-square
+      name: payment gateway
       env: docker
       autoDeploy: true
       healthCheckPath: /healthz
@@ -8,7 +8,7 @@ services:
       envVars:
           - key: DATABASE_URL
             fromDatabase:
-                name: db-for-payment-gateway
+                name: payment gateway db
                 property: connectionString
           - key: NODE_ENV
             value: development
@@ -19,5 +19,5 @@ services:
           - key: SQUARE_ACCESS_TOKEN
             value: xxxx-xxxx-xxxx-xxxx
 databases:
-    - name: db-for-payment-gateway
+    - name: payment gateway db
       plan: free
