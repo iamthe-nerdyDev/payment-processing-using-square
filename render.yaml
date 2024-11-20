@@ -1,6 +1,6 @@
 services:
-    - type: payment-gateway-with-square
-      name: api
+    - type: web
+      name: payment-gateway-with-square
       env: docker
       autoDeploy: true
       healthCheckPath: /healthz
