@@ -19,20 +19,20 @@ export interface SessionInput extends Optional<SessionAttributes, 'id'> {}
 export interface SessionOuput extends Required<SessionAttributes> {}
 
 class Session extends Model<SessionAttributes, SessionInput> implements SessionAttributes {
-    public id!: number;
-    public userId!: number;
-    public device!: string;
-    public ip!: string;
-    public isActive!: boolean;
-    public metadata!: any;
+    declare id: number;
+    declare userId: number;
+    declare device: string;
+    declare ip: string;
+    declare isActive: boolean;
+    declare metadata: any;
 
     // timestamps
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-    public readonly deletedAt!: Date;
+    declare readonly createdAt: Date;
+    declare readonly updatedAt: Date;
+    declare readonly deletedAt: Date;
 
     // external model/s
-    public readonly user!: User;
+    declare readonly user: User;
 }
 
 Session.init(

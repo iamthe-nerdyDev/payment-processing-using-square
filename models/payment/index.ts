@@ -24,24 +24,24 @@ export interface PaymentInput extends Optional<PaymentAttributes, 'id' | 'refere
 export interface PaymentOuput extends Required<PaymentAttributes> {}
 
 class Payment extends Model<PaymentAttributes, PaymentInput> implements PaymentAttributes {
-    public id!: number;
-    public userId!: number;
-    public cardId!: number;
-    public reference!: string;
-    public amount!: number;
-    public currency!: string;
-    public status!: string;
-    public squarePaymentId!: string;
-    public metadata!: any;
+    declare id: number;
+    declare userId: number;
+    declare cardId: number;
+    declare reference: string;
+    declare amount: number;
+    declare currency: string;
+    declare status: string;
+    declare squarePaymentId: string;
+    declare metadata: any;
 
     // timestamps
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-    public readonly deletedAt!: Date;
+    declare readonly createdAt: Date;
+    declare readonly updatedAt: Date;
+    declare readonly deletedAt: Date;
 
     // external model/s
-    public readonly card!: Card;
-    public readonly user!: User;
+    declare readonly card: Card;
+    declare readonly user: User;
 }
 
 Payment.init(

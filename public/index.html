@@ -3,9 +3,189 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Document</title>
+        <title>Payment Gateway using Square</title>
+        <script
+            type="text/javascript"
+            src="https://sandbox.web.squarecdn.com/v1/square.js"
+        ></script>
+        <script>
+            const appId = 'sandbox-sq0idb-LTy2vrxW16XPbJsKiPrF_A';
+            const locationId = 'LGV49H19WXXJM';
+            const baseURL = 'http://localhost:7777';
+
+            let accessToken, refreshToken;
+
+            function loadTokens() {
+                accessToken = localStorage.getItem('gateway/accessToken');
+                refreshToken = localStorage.getItem('gateway/refreshToken');
+            }
+
+            async function initializeCardModal(payments) {
+                const card = await payments.card();
+                await card.attach('#card-container');
+
+                return card;
+            }
+
+            async function addCardToUserProfile(token, verificationToken, cardholderName) {
+                const body = JSON.stringify({
+                    token,
+                    verificationToken,
+                    cardholderName,
+                });
+
+                const addCardResponse = await fetch(`${baseURL}/v1/card`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${accessToken}`,
+                        'X-Refresh': refreshToken,
+                    },
+                    body,
+                });
+
+                if (addCardResponse.ok) return addCardResponse.json();
+                const errorBody = await addCardResponse.text();
+                throw new Error(errorBody);
+            }
+
+            async function tokenize(paymentMethod) {
+                const tokenResult = await paymentMethod.tokenize();
+                if (tokenResult.status === 'OK') {
+                    return tokenResult.token;
+                } else {
+                    let errorMessage = `Tokenization failed with status: ${tokenResult.status}`;
+                    if (tokenResult.errors) {
+                        errorMessage += ` and errors: ${JSON.stringify(tokenResult.errors)}`;
+                    }
+
+                    throw new Error(errorMessage);
+                }
+            }
+
+            async function verifyBuyer(payments, token) {
+                const whoamiResponse = await fetch(`${baseURL}/v1/user/whoami`, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        'X-Refresh': refreshToken,
+                    },
+                });
+
+                if (!addCardResponse.ok) {
+                    const errorBody = await whoamiResponse.text();
+                    throw new Error(errorBody);
+                }
+
+                const { data: user } = await whoamiResponse.json();
+
+                const verificationDetails = {
+                    intent: 'STORE',
+                    billingContact: {
+                        givenName: user.firstName,
+                        familyName: user.lastName,
+                        email: user.emailAddress,
+                        addressLines: ['500 Electric Ave', 'Suite 600'],
+                        state: 'NY',
+                        countryCode: 'US',
+                    },
+                };
+
+                const verificationResults = await payments.verifyBuyer(token, verificationDetails);
+                return verificationResults.token;
+            }
+
+            document.addEventListener('DOMContentLoaded', async function () {
+                if (!window.Square) throw new Error('Square.js failed to load properly');
+
+                let payments;
+                try {
+                    payments = window.Square.payments(appId, locationId);
+                } catch (e) {
+                    console.log(e);
+                    alert(`Square Error: ${e.message}` || 'Unable to load square payment window');
+                    return;
+                }
+
+                let card;
+                try {
+                    card = await initializeCardModal(payments);
+                } catch (e) {
+                    console.error('Initializing Card failed', e);
+                    alert(`Square Error: ${e.message}` || 'Unable to initialize card');
+                    return;
+                }
+
+                async function handlePaymentMethodSubmission(event, card) {
+                    event.preventDefault();
+
+                    try {
+                        cardButton.disabled = true;
+                        const token = await tokenize(card);
+                        const verificationToken = await verifyBuyer(payments, token);
+                        const paymentResults = await addCardToUserProfile(
+                            token,
+                            verificationToken,
+                            'John Doe'
+                        );
+
+                        console.debug('Payment Success', paymentResults);
+                    } catch (e) {
+                        cardButton.disabled = false;
+                        console.error(e.message);
+                    }
+                }
+
+                const cardButton = document.getElementById('card-button');
+                cardButton.addEventListener('click', async function (event) {
+                    await handlePaymentMethodSubmission(event, card);
+                });
+
+                const updateTokensBtn = document.getElementById('update-tokens-btn');
+                const accessTokenInput = document.getElementById('accessTokenInput');
+                const refreshTokenInput = document.getElementById('refreshTokenInput');
+
+                loadTokens();
+
+                accessTokenInput.value = accessToken || '';
+                refreshTokenInput.value = refreshToken || '';
+
+                updateTokensBtn.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    accessToken = accessTokenInput.value;
+                    refreshToken = refreshTokenInput.value;
+
+                    localStorage.setItem('gateway/accessToken', accessTokenInput.value);
+                    localStorage.setItem('gateway/refreshToken', refreshTokenInput.value);
+
+                    alert('Tokens saved!');
+                });
+            });
+        </script>
     </head>
     <body>
-        <h1>Hello world!</h1>
+        <div class="container">
+            <h1>Add Card to your profile!</h1>
+
+            <form action="#">
+                <div>
+                    <label for="accessTokenInput">Access Token:</label>
+                    <input type="text" id="accessTokenInput" />
+                </div>
+
+                <div>
+                    <label for="refreshTokenInput">Refresh Token:</label>
+                    <input type="text" id="refreshTokenInput" />
+                </div>
+
+                <button id="update-tokens-btn">Save tokens</button>
+            </form>
+
+            <form id="payment-form">
+                <div id="card-container"></div>
+                <button id="card-button" type="button">Add Card to Profile</button>
+            </form>
+        </div>
     </body>
 </html>

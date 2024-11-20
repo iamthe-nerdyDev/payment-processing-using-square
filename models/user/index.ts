@@ -25,23 +25,23 @@ export interface UserInput extends Optional<UserAttributes, 'id' | 'squareCustom
 export interface UserOuput extends Required<UserAttributes> {}
 
 class User extends Model<UserAttributes, UserInput> implements UserAttributes {
-    public id!: number;
-    public firstName!: string;
-    public lastName!: string;
-    public emailAddress!: string;
-    public password!: string;
-    public squareCustomerId!: string;
-    public metadata!: any;
+    declare id: number;
+    declare firstName: string;
+    declare lastName: string;
+    declare emailAddress: string;
+    declare password: string;
+    declare squareCustomerId: string;
+    declare metadata: any;
 
     // timestamps
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-    public readonly deletedAt!: Date;
+    declare readonly createdAt: Date;
+    declare readonly updatedAt: Date;
+    declare readonly deletedAt: Date;
 
     // external model/s
-    public readonly cards!: Card[];
-    public readonly sessions!: Session[];
-    public readonly payments!: Payment[];
+    declare readonly cards: Card[];
+    declare readonly sessions: Session[];
+    declare readonly payments: Payment[];
 }
 
 User.init(

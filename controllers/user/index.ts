@@ -66,7 +66,7 @@ export default class UserController {
             },
         });
 
-        if (!user || !(await bcryptjs.compare(payload.password, user.password))) {
+        if (!user || !bcryptjs.compareSync(payload.password, user.password)) {
             throw new ApplicationError('Incorrect email address or password', 400);
         }
 

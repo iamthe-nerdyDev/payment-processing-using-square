@@ -8,8 +8,10 @@ RUN npm install
 
 COPY . .
 
+RUN npm run migrate:up
+
 RUN npm run build
 
-EXPOSE 8080
+EXPOSE 10000
 
 CMD ["npm", "run", "start"]

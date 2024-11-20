@@ -25,26 +25,26 @@ export interface CardInput extends Optional<CardAttributes, 'id'> {}
 export interface CardOuput extends Required<CardAttributes> {}
 
 class Card extends Model<CardAttributes, CardInput> implements CardAttributes {
-    public id!: number;
-    public squareCardId!: string;
-    public verificationToken!: string;
-    public userId!: number;
-    public enabled!: boolean;
-    public last4!: string;
-    public cardholderName!: string;
-    public cardBrand!: string;
-    public cardType!: string;
-    public expMonth!: number;
-    public expYear!: number;
-    public metadata!: any;
+    declare id: number;
+    declare squareCardId: string;
+    declare verificationToken: string;
+    declare userId: number;
+    declare enabled: boolean;
+    declare last4: string;
+    declare cardholderName: string;
+    declare cardBrand: string;
+    declare cardType: string;
+    declare expMonth: number;
+    declare expYear: number;
+    declare metadata: any;
 
     // timestamps
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-    public readonly deletedAt!: Date;
+    declare readonly createdAt: Date;
+    declare readonly updatedAt: Date;
+    declare readonly deletedAt: Date;
 
     // external model/s
-    public readonly payments!: Payment[];
+    declare readonly payments: Payment[];
 }
 
 Card.init(

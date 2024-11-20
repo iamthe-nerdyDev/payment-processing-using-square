@@ -63,6 +63,9 @@ export default function createApp() {
                 {
                     url: 'http://localhost:7777',
                 },
+                {
+                    url: 'https://payment-gateway-fi7h.onrender.com',
+                },
             ],
             components: {
                 securitySchemes: {
