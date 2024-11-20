@@ -12,7 +12,7 @@
         <script>
             const appId = 'sandbox-sq0idb-LTy2vrxW16XPbJsKiPrF_A';
             const locationId = 'LGV49H19WXXJM';
-            const baseURL = 'https://payment-gateway-vlng.onrender.com';
+            const baseURL = 'https://payment-gateway-with-square.onrender.com';
 
             let accessToken, refreshToken, whoami;
 
@@ -65,6 +65,8 @@
             }
 
             async function getWhoAmI() {
+                if (!accessToken || !refreshToken) return undefined;
+
                 const whoamiResponse = await fetch(`${baseURL}/v1/user/whoami`, {
                     method: 'GET',
                     headers: {
@@ -84,6 +86,7 @@
 
             async function verifyBuyer(payments, token) {
                 whoami = await getWhoAmI();
+                if (!whoami) throw 'Authorization tokens are missing';
 
                 const verificationDetails = {
                     intent: 'STORE',
@@ -204,7 +207,7 @@
                         Click
                         <a
                             target="_blank"
-                            href="https://payment-gateway-vlng.onrender.com/api-docs/#/User/post_v1_user_signin"
+                            href="https://payment-gateway-with-square.onrender.com/api-docs/#/User/post_v1_user_signin"
                         >
                             here
                         </a>
@@ -230,12 +233,12 @@
                 </form>
 
                 <a
-                    href="https://payment-gateway-vlng.onrender.com/api-docs/#/Payment/post_v1_payment_init"
+                    href="https://payment-gateway-with-square.onrender.com/api-docs/#/Payment/post_v1_payment_init"
                     target="_blank"
                 >
                     Click here to make a payment
                 </a>
-                <p class="info">You have <strong id="cards-count">1</strong> card/s</p>
+                <p class="info">You have <strong id="cards-count">0</strong> card/s</p>
             </div>
         </div>
     </body>

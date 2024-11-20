@@ -64,9 +64,9 @@ npm run test
 
 ## Resources
 
--   Server Instance: [https://payment-gateway-vlng.onrender.com](https://payment-gateway-vlng.onrender.com)
--   Swagger Documentation: [https://payment-gateway-vlng.onrender.com/api-docs](https://payment-gateway-vlng.onrender.com/api-docs)
--   Example UI: [https://client-payment-gateway-vlng.onrender.com](https://client-payment-gateway-vlng.onrender.com)
+-   Server Instance: [https://payment-gateway-with-square.onrender.com](https://payment-gateway-with-square.onrender.com)
+-   Swagger Documentation: [https://payment-gateway-with-square.onrender.com/api-docs](https://payment-gateway-with-square.onrender.com/api-docs)
+-   Example UI: [https://payment-gateway-frontend-with-square.onrender.com](https://payment-gateway-frontend-with-square.onrender.com)
 -   Square Sandbox Test Details: [https://developer.squareup.com/docs/devtools/sandbox/payments#card-not-present-success-state-values](https://developer.squareup.com/docs/devtools/sandbox/payments#card-not-present-success-state-values)
 
 ## Deployment
