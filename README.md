@@ -74,3 +74,5 @@ npm run test
 Detailed deployment instructions are available in [DEPLOYMENT.md](https://github.com/iamthe-nerdyDev/payment-processing-using-square/blob/main/DEPLOYMENT.md)
 
 ## Access & Refresh Token Flow
+
+![](./diagrams/access-and-refresh-token-flow.png)
