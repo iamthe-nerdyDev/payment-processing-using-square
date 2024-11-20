@@ -27,9 +27,7 @@ services:
           - path: /*
             name: Cache-Control
             value: no-cache
-      pullRequestPreviewsEnabled: true
       autoDeploy: true
-      plan: free
 databases:
     - name: payment gateway with square db
       plan: free
