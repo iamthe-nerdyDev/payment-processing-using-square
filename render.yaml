@@ -18,6 +18,17 @@ services:
             generateValue: true
           - key: SQUARE_ACCESS_TOKEN
             value: --
+    - type: static
+      name: payment gateway frontend with square
+      buildCommand: true
+      staticPublishPath: ./public
+      headers:
+          - path: /*
+            name: Cache-Control
+            value: no-cache
+      pullRequestPreviewsEnabled: true
+      autoDeploy: true
+      plan: free
 databases:
     - name: payment gateway with square db
       plan: free
