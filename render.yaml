@@ -11,7 +11,7 @@ services:
                 name: payment gateway db
                 property: connectionString
           - key: NODE_ENV
-            value: development
+            value: production
           - key: PORT
             value: 10000
           - key: JWT_SECRET
