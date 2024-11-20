@@ -1,8 +1,10 @@
 import Env from '../../env';
-import { Client, Environment, ApiError } from 'square';
+import { Client, Environment } from 'square';
 
 const { IS_PROD, SQUARE_ACCESS_TOKEN } = Env;
 if (!SQUARE_ACCESS_TOKEN) throw 'SQUARE_ACCESS_TOKEN is missing in .env';
+
+if (SQUARE_ACCESS_TOKEN === 'xxxx-xxxx-xxxx-xxxx') throw 'invalid SQUARE_ACCESS_TOKEN set';
 
 const client = new Client({
     environment: IS_PROD ? Environment.Production : Environment.Sandbox,

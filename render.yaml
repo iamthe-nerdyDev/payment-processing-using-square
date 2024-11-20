@@ -17,6 +17,7 @@ services:
           - key: JWT_SECRET
             generateValue: true
           - key: SQUARE_ACCESS_TOKEN
+            value: xxxx-xxxx-xxxx-xxxx
 databases:
     - name: db-for-payment-gateway
       plan: free
