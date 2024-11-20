@@ -8,7 +8,7 @@ import { customAlphabet } from 'nanoid';
 import { ApiError } from 'square';
 
 export default class PaymentRepo {
-    constructor(public Model = Payment) {}
+    constructor(public Model = Payment, private squareClient = square) {}
 
     private generateReferenceNumber(length = 10) {
         const alphabets = 'QWERTYUIOPASDFGHJKLZXCVBNM0123456789';
@@ -25,7 +25,7 @@ export default class PaymentRepo {
 
     async debitCard(payment: Payment) {
         try {
-            const createPaymentResponse = await square.paymentsApi.createPayment({
+            const createPaymentResponse = await this.squareClient.paymentsApi.createPayment({
                 sourceId: payment.card.squareCardId,
                 idempotencyKey: crypto.randomUUID(),
                 // verificationToken: payment.card.verificationToken,

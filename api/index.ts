@@ -92,6 +92,8 @@ export default function createApp() {
 
     app.use(sanitizeInput);
     app.use(deserializeUser);
+
+    app.use(express.static('public'));
     app.use('/v1/', v1Routes);
 
     /**

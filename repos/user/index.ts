@@ -5,7 +5,7 @@ import common from '../../shared/common';
 import ApplicationError from '../../shared/helpers/applicationError';
 
 export default class UserRepo {
-    constructor(public Model = User) {}
+    constructor(public Model = User, private squareClient = square) {}
 
     async createUser(payload: UserInput) {
         const emailExists = await this.Model.count({
@@ -18,7 +18,7 @@ export default class UserRepo {
             throw new ApplicationError('User with email address already exist', 409);
         }
 
-        const createCustomerResponse = await square.customersApi.createCustomer({
+        const createCustomerResponse = await this.squareClient.customersApi.createCustomer({
             emailAddress: payload.emailAddress,
             familyName: payload.lastName,
             givenName: payload.firstName,
@@ -42,7 +42,7 @@ export default class UserRepo {
 
         await Promise.all([
             user.update(payload),
-            square.customersApi.updateCustomer(user.squareCustomerId, {
+            this.squareClient.customersApi.updateCustomer(user.squareCustomerId, {
                 emailAddress: payload.emailAddress,
                 familyName: payload.lastName,
                 givenName: payload.firstName,
@@ -58,7 +58,7 @@ export default class UserRepo {
 
         await Promise.all([
             user.destroy(),
-            square.customersApi.deleteCustomer(user.squareCustomerId),
+            this.squareClient.customersApi.deleteCustomer(user.squareCustomerId),
         ]);
     }
 }

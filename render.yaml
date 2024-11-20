@@ -1,0 +1,22 @@
+services:
+    - type: payment-gateway-with-square
+      name: api
+      env: docker
+      autoDeploy: true
+      healthCheckPath: /healthz
+      plan: free
+      envVars:
+          - key: DATABASE_URL
+            fromDatabase:
+                name: hasura
+                property: connectionString
+          - key: NODE_ENV
+            value: development
+          - key: PORT
+            value: 8080
+          - key: JWT_SECRET
+            generateValue: true
+          - key: SQUARE_ACCESS_TOKEN
+databases:
+    - name: db-for-payment-gateway
+      plan: free

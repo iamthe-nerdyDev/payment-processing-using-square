@@ -6,7 +6,7 @@ import common from '../../shared/common';
 import { UserOuput } from '../../models/user';
 
 export default class CardRepo {
-    constructor(public Model = Card) {}
+    constructor(public Model = Card, private squareClient = square) {}
 
     async createCard(
         cardToken: string,
@@ -14,7 +14,7 @@ export default class CardRepo {
         verificationToken: string,
         user: UserOuput
     ) {
-        const createCardResponse = await square.cardsApi.createCard({
+        const createCardResponse = await this.squareClient.cardsApi.createCard({
             idempotencyKey: crypto.randomUUID(),
             sourceId: cardToken,
             verificationToken,
@@ -45,7 +45,7 @@ export default class CardRepo {
         const card = await this.Model.findByPk(id);
         if (!card) throw new ApplicationError('Card not found', 404);
 
-        const { result: respone } = await square.cardsApi.disableCard(card.squareCardId);
+        const { result: respone } = await this.squareClient.cardsApi.disableCard(card.squareCardId);
 
         await card.update({
             enabled: respone.card?.enabled || false,

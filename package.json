@@ -3,7 +3,6 @@
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
-    "type": "commonjs",
     "scripts": {
         "migrate:up": "npx sequelize-cli db:migrate",
         "migrate:down": "npx sequelize-cli db:migrate:undo",
@@ -13,6 +12,10 @@
         "start": "node build/index.js",
         "start:dev": "ts-node-dev --respawn --transpile-only index.ts",
         "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "engines": {
+        "node": "20.x",
+        "npm": "10.x"
     },
     "keywords": [],
     "author": "",
